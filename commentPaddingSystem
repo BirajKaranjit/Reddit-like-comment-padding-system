@@ -1,0 +1,85 @@
+import React, { useState } from 'react';
+
+const Comment = ({ comment, addReply }) => {
+  const [showReplyBox, setShowReplyBox] = useState(false);
+  const [replyText, setReplyText] = useState('');
+
+  const handleReply = () => {
+    addReply(replyText);
+    setReplyText('');
+    setShowReplyBox(false);
+  };
+
+  return (
+    <div>
+      <p>{comment.text}</p>
+      <button onClick={() => setShowReplyBox(!showReplyBox)}>
+        Reply
+      </button>
+      {showReplyBox && (
+        <div>
+          <input
+            value={replyText}
+            onChange={e => setReplyText(e.target.value)}
+          />
+          <button onClick={handleReply}>Submit Reply</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const NestedComment = ({ comment }) => {
+  const [replies, setReplies] = useState([]);
+
+  const addReply = replyText => {
+    setReplies([...replies, { text: replyText }]);
+  };
+
+  return (
+    <div style={{ paddingLeft: '16px' }}>
+    <Comment comment={comment} addReply={addReply} />
+      {replies.map((reply, i) => (
+        <NestedComment key={i} comment={reply} />
+      ))}
+    </div>
+  );
+};
+
+const CommentSection = () => {
+  const [comments, setComments] = useState([]);
+  const [newCommentText, setNewCommentText] = useState('');
+
+  const addComment = () => {
+    setComments([...comments, { text: newCommentText }]);
+    setNewCommentText('');
+  };
+
+  return (
+    <div>
+      <input
+        value={newCommentText}
+        onChange={e => setNewCommentText(e.target.value)}
+      />
+      <button onClick={addComment}>Add Comment</button>
+      {comments.map((comment, i) => (
+        <NestedComment key={i} comment={comment} />
+      ))}
+    </div>
+  );
+};
+
+const MainComment = () =>{
+  return <>
+    <p>Reddit like padding system</p>
+  </>
+}
+
+export default function App() {
+  return (
+    <div className="App">
+      <MainComment />
+      <CommentSection />
+    </div>
+  );
+}
